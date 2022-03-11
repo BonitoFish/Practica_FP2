@@ -1,51 +1,81 @@
 #include <iostream>
+#include "main.h"
 
 using namespace std;
 
-// Parámetros globales
-const int MIN_NumJugadores = 2;
-const int MAX_NumJugadores = 4;
-
-const int MIN_NumFichas = 8;
-const int MAX_NumFichas = 13;
-
-const int MIN_IniFichas = 6;
-const int MAX_IniFichas = 14;
-
-const int MIN_MaxFichas = 50;
-
-typedef enum tColor { rojo, verde, azul, amarillo, blanco, libre } tColor;
-
-typedef struct {
-	int valor;
-	tColor color;
-}tFicha;
-
-typedef struct {
-	tFicha lista_ficha[MIN_MaxFichas];
-
-}tSoporte;
-
-tSoporte lista_soporte[MAX_NumJugadores];
-
-typedef struct {
-	tFicha bolsa[8][MAX_NumFichas];
-	int fichas_disp;
-}tBolsa;
-
-
-
-void parametros(int& numero_jugador, int& numero_fichas);
-
-
 int main() {
-	int numero_j = 0;
-	int numero_fichas = 0;
 
-	parametros(numero_j, numero_fichas);
+	std::srand(time(NULL));
 
-
+	for (int i = 0; i < 100; i++) {
+		cout << std::rand() % 8 + 0 << endl;
+	}
+	
 	return 0;
+}
+
+int menu() {
+	int op;
+	do {
+		cout << "1: Ordenar por num, 2: Ordenar por color, 3: Sugerir, 4: Poner, 0: Fin >>> ";
+		cin >> op;
+	} while (op > 4 || op < 0);
+	return op;
+}
+
+void inicializarBolsa(tBolsa& bolsa) {
+	/* TODO, se hay que iniciar los valores de las fichas de la bolsa, pero no se si eso se hará
+	con un fichero de entrada o de alguna otra manera*/
+}
+
+tFicha robar(tBolsa& bolsa) {
+	tFicha ret = { -1, libre };
+	std::srand(time(NULL));
+
+	int fila_rand = std::rand() % 8 + 0; // Rango 0 - 7 incluidos
+	int col_rand = std::rand() % bolsa.num_fichas + 0; // Rando 0 - bolsa.num_fichas-1 incluidos
+
+	if (bolsa.fichas[fila_rand][col_rand].color != libre) {
+		ret = { bolsa.fichas[fila_rand][col_rand].valor, bolsa.fichas[fila_rand][col_rand].color };
+		bolsa.fichas[fila_rand][col_rand] = { -1, libre };
+	}
+	else {
+		for (int i = fila_rand; i < 8; i++) {
+			for (int j = col_rand; j < bolsa.num_fichas; j++) {
+				if (bolsa.fichas[i][j].color != libre) {
+					ret = { bolsa.fichas[i][j].valor, bolsa.fichas[i][j].color };
+					bolsa.fichas[i][j] = { -1, libre };
+					break;
+				}
+			}
+		}
+
+		if (ret.color == libre) {
+			for (int i = 0; i < fila_rand; i++) {
+				for (int j = 0 ; j < bolsa.num_fichas; j++) {
+					if (bolsa.fichas[i][j].color != libre) {
+						ret = { bolsa.fichas[i][j].valor, bolsa.fichas[i][j].color };
+						bolsa.fichas[i][j] = { -1, libre };
+						break;
+					}
+				}
+			}
+		}
+
+		if (ret.color == libre) {
+			for (int i = fila_rand;;) {
+				for (int j = 0; j < col_rand; j++) {
+					if (bolsa.fichas[fila_rand][col_rand].color != libre) {
+						ret = { bolsa.fichas[i][j].valor, bolsa.fichas[i][j].color };
+						bolsa.fichas[i][j] = { -1, libre };
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	return ret;
 }
 
 void parametros(int& numero_j, int& numero_fichas) {
@@ -60,7 +90,6 @@ void parametros(int& numero_j, int& numero_fichas) {
 			cout << "valor no aceptado, introduce de nuevo:  ";
 			cin.ignore();
 		}
-
 		else
 		{
 			numero_j = aux - '0';
