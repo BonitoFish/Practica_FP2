@@ -1,4 +1,5 @@
 #include <iostream>
+<<<<<<< HEAD
 #include "main.h"
 
 using namespace std;
@@ -108,3 +109,13 @@ void parametros(int& numero_j, int& numero_fichas) {
 
 	cout << endl;
 }
+=======
+using namespace std;
+
+
+int main () {
+cout << "prueba";
+
+
+}
+>>>>>>> 17b6d2eae08592080ecce8e07267c9a764c1892a
