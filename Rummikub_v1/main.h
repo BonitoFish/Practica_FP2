@@ -24,7 +24,7 @@ typedef struct {
 // El soporte representa las fichas que tiene un jugador
 typedef struct {
 	tFicha lista_ficha[MaxFichas];
-	int num_fichas;	
+	int num_fichas;		// Número de fichas del soporte
 }tSoporte;
 
 // Estructura que mantiene los soportes de los jugadores
@@ -40,13 +40,10 @@ typedef struct {
 	int fichas_disponibles;		
 }tBolsa;
 
-// tJugada representa cada jugada que realiza el jugadores, además termina con el centinela -1
-typedef tFicha tJugada[MAX_NumFichas + 1];
-
 typedef struct {
 	tFicha lista_jugada[MAX_NumFichas + 1];
 	int num_fichas;		// Número máximo de fichas de la jugada
-	int num_fichas_jugadas;		// Número de fichas jugadas
+	int num_fichas_jugada;		// Número de fichas jugadas
 }tJugada;
 
 // El tablero es donde contiene las jugadas 
@@ -78,8 +75,14 @@ void mostrarSeries(tSoporte soporte);	// Muestran las posíbles series que se pue
 
 void mostrarEscaleras(tSoporte soporte);	// Muestran las posíbles escaleraas que se puedan crear con las fichas del soporte
 
-void iniJugada(tJugada jugada);		// Inicia las fichas de la jugada a -1
+void iniJugada(tJugada &jugada);		// Inicia las fichas de la jugada a -1
 
 void nuevaJugada(tTablero& tablero, tJugada jugada);	// Añade al tablero la nueva jugada
 
+void eliminaFichas(tSoporte& soporte, const tJugada jugada); // Elimina del soporte las fichas que hay en la jugada.
+
+int nuevaJugada(tSoporte soporte, tJugada jugada); // Permite al usuario crear una jugada con fichas que haya en su soporte.
+
 void parametros(int& numero_jugador, int& numero_fichas);
+
+void colorTexto(tColor color);
