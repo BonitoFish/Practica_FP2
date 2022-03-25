@@ -4,7 +4,7 @@
 using namespace std;
 
 int main() {
-	
+	/*
 	tSoporte lista;
 	lista.lista_ficha[0] = { 7, azul };
 	lista.lista_ficha[1] = { 3, azul };
@@ -20,18 +20,23 @@ int main() {
 	lista.lista_ficha[11] = { 6, rojo };
 	lista.lista_ficha[12] = { 7, verde };
 	lista.num_fichas = 13;
+	*/
 
+	tBolsa bolsa;
+	bolsa.num_fichas = 13;
+	inicializarBolsa(bolsa);
+	mostrar(bolsa);
 
-	ordenarPorNum(lista);
-	ordenarPorColor(lista);
+	tSoporte j1, j2;
+	j1.num_fichas = 0;
 	
-	mostrarSeries(lista);
-	mostrarEscaleras(lista);
-	
+	for (int i = 0; i < 20; i++) {
+		j1.lista_ficha[i] = robar(bolsa);
+		j1.num_fichas++;
+	}
 
-	colorTexto(blanco);
-	
-	
+	mostrar(bolsa);
+	mostrar(j1);
 
 	return 0;
 }
@@ -254,7 +259,7 @@ void mostrarEscaleras(tSoporte soporte) {
 	}
 }
 
-
+// Hay que ver
 void iniJugada(tJugada &jugada) {
 	for (int i = 0; i < jugada.num_fichas; i++) {
 		jugada.lista_jugada[i] = { -1, libre };
@@ -294,8 +299,99 @@ void eliminaFichas(tSoporte& soporte, const tJugada jugada) {
 
 int nuevaJugada(tSoporte soporte, tJugada jugada) {
 
+	mostrar(soporte);
+	mostrarIndices(soporte.num_fichas);
+
+	return 1;
+}
+
+bool ponerFicha(tJugada jugada, tFicha ficha) {
+
+	return true;
+}
 
 
+int menor(const tSoportes soportes) {
+
+	int ret = -1;
+	int menor = -1; 
+
+	for (int i = 0; i < soportes.num_jug; i++) {
+		int acum = 0;	// Variable acumulador que suma todos los valores del soporte de un jugador
+		for (int j = 0; j < soportes.soporte_jug[i].num_fichas; j++) {
+			acum += soportes.soporte_jug[i].lista_ficha[j].valor;
+		}
+
+		if (menor == -1) {	// Solo entra una vez al if para establecer un valor inicial válido
+			menor = acum;
+			ret = i;
+		}
+		else if (acum < menor) {
+			menor = acum;
+			ret = i;
+		}
+	}
+
+	if (ret == -1) {
+		cout << "Error en funcion menor()";
+	}
+
+	return ret;
+}
+
+
+void mostrar(tFicha ficha) {
+	colorTexto(ficha.color);
+	cout << "  " << ficha.valor << "  ";
+}
+
+
+void mostrar(tBolsa bolsa) {
+
+	cout << "Bolsa:" << endl;
+
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < bolsa.num_fichas; j++) {
+			colorTexto(bolsa.fichas[i][j].color);
+			cout << bolsa.fichas[i][j].valor << "  ";
+		}
+		cout << endl;
+	}
+}
+
+void mostrar(const tJugada jugada) {
+	for (int i = 0; i < jugada.num_fichas_jugada; i++) {
+		colorTexto(jugada.lista_jugada[i].color);
+		cout << "  " << jugada.lista_jugada[i].valor;
+	}
+}
+
+
+void mostrar(tTablero tablero) {
+	for (int i = 0; i < tablero.cont_jugadas; i++) {
+		cout << i + 1 << ":";
+		mostrar(tablero.lista_jugadas[i]);
+		cout << endl;
+	}
+}
+
+
+void mostrar(tSoporte soporte) {
+	cout << "Soporte:";
+	for (int i = 0; i < soporte.num_fichas; i++) {
+		colorTexto(soporte.lista_ficha[i].color);
+		cout << "  " << soporte.lista_ficha[i].valor;
+	}
+	cout << endl;
+}
+
+
+void mostrarIndices(int num) {
+	colorTexto(blanco);
+	cout << "          ";
+	for (int i = 0; i < num; i++) {
+		cout << "  " << i + 1;
+	}
 }
 
 

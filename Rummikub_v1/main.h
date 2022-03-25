@@ -83,6 +83,23 @@ void eliminaFichas(tSoporte& soporte, const tJugada jugada); // Elimina del sopo
 
 int nuevaJugada(tSoporte soporte, tJugada jugada); // Permite al usuario crear una jugada con fichas que haya en su soporte.
 
+bool ponerFicha(tJugada jugada, tFicha ficha); // Intenta colocar la Ficha en la Jugada
+
+int menor(const tSoportes soportes); // Devuelve el índice del soporte que acumula el menor número de puntos
+
+void mostrar(tFicha ficha); // Muestra la Ficha
+
+void mostrar(tBolsa bolsa); // Muestra el contenido de la Bolsa
+
+void mostrar(const tJugada jugada); // Muestra la Jugada
+
+void mostrar(tTablero tablero); // Muestra el Tablero
+
+void mostrar(tSoporte soporte); // Muestra las fichas que hay en el soporte
+
+void mostrarIndices(int num);  // Muestra los índices debajo de un soporte para facilitar la selección de fichas
+
 void parametros(int& numero_jugador, int& numero_fichas);
+
 
 void colorTexto(tColor color);
