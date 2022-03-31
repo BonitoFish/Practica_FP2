@@ -1,4 +1,6 @@
 #include <iostream>
+#include <time.h>
+#include <iomanip>
 #include "main.h"
 
 using namespace std;
@@ -22,21 +24,22 @@ int main() {
 	lista.num_fichas = 13;
 	*/
 
-	tBolsa bolsa;
-	bolsa.num_fichas = 13;
-	inicializarBolsa(bolsa);
-	mostrar(bolsa);
+	tJugada jugada;
+	tFicha ficha = { 7, amarillo };
 
-	tSoporte j1, j2;
-	j1.num_fichas = 0;
-	
-	for (int i = 0; i < 20; i++) {
-		j1.lista_ficha[i] = robar(bolsa);
-		j1.num_fichas++;
+	jugada.num_fichas_jugada = 3;
+	jugada.lista_jugada[0] = {6, azul};
+	jugada.lista_jugada[1] = { 6, rojo };
+	jugada.lista_jugada[2] = { 6, amarillo };
+	//jugada.lista_jugada[3] = { 6, amarillo };
+	jugada.lista_jugada[3] = { -1, libre };
+
+	if (ponerFicha(jugada, ficha)) {
+		cout << "ficha colocada";
 	}
-
-	mostrar(bolsa);
-	mostrar(j1);
+	else {
+		cout << "ficha no colocada";
+	}
 
 	return 0;
 }
@@ -65,44 +68,40 @@ void inicializarBolsa(tBolsa& bolsa) {
 
 tFicha robar(tBolsa& bolsa) {
 	tFicha ret = { -1, libre };
-	std::srand(time(NULL));
 
 	int fila_rand = std::rand() % 8 + 0; // Rango 0 - 7 incluidos
 	int col_rand = std::rand() % bolsa.num_fichas + 0; // Rando 0 - bolsa.num_fichas-1 incluidos
 
-	if (bolsa.fichas[fila_rand][col_rand].color != libre) {
+	if (bolsa.fichas[fila_rand][col_rand].valor != -1) {	// Devuelve la ficha si la encuentra en una posición random
 		ret = { bolsa.fichas[fila_rand][col_rand].valor, bolsa.fichas[fila_rand][col_rand].color };
 		bolsa.fichas[fila_rand][col_rand] = { -1, libre };
-		return ret;
 	}
 	else {
-		for (int i = fila_rand; i < 8; i++) {
-			for (int j = col_rand; j < bolsa.num_fichas; j++) {
-				if (bolsa.fichas[i][j].color != libre) {
-					ret = { bolsa.fichas[i][j].valor, bolsa.fichas[i][j].color };
-					bolsa.fichas[i][j] = { -1, libre };
-					return ret;
-				}
+		int i = (col_rand == bolsa.num_fichas - 1 && fila_rand != 7) ? fila_rand + 1 :
+			(col_rand == bolsa.num_fichas - 1 && fila_rand == 7) ? 0 : fila_rand;
+		int j = (col_rand + 1) % bolsa.num_fichas;
+		
+		// Implementación mediante búsqueda circular
+		for (int k = 0; k < (8 * bolsa.num_fichas)-1; k++) {
+			if (bolsa.fichas[i][j].valor != -1) {	
+				ret = { bolsa.fichas[i][j].valor, bolsa.fichas[i][j].color };
+				bolsa.fichas[i][j] = { -1, libre };
+				return ret;
 			}
-		}
 
-		for (int i = 0; i <= fila_rand; i++) {
-			for (int j = 0; j < bolsa.num_fichas; j++) {
-				if (bolsa.fichas[i][j].color != libre) {
-					ret = { bolsa.fichas[i][j].valor, bolsa.fichas[i][j].color };
-					bolsa.fichas[i][j] = { -1, libre };
-					return ret;
-				}
-			}
-		}
+			 i = (j == bolsa.num_fichas - 1 && i != 7) ? i + 1 :
+				(j == bolsa.num_fichas - 1 && i == 7) ? 0 : i;
+			 j = (j + 1) % bolsa.num_fichas;
+		}	
 	}
+	
 	return ret;
 }
 
 
 void repartir(tBolsa& bolsa, tSoportes& soportes) {
 	for (int i = 0; i < soportes.num_jug; i++) {
-		for (int j = 0; j < bolsa.num_fichas; j++) {
+		for (int j = 0; j < soportes.ini_fichas; j++) {
 			soportes.soporte_jug[i].lista_ficha[j] = robar(bolsa);
 			soportes.soporte_jug[i].num_fichas++;
 		}
@@ -122,7 +121,6 @@ void ordenarPorNum(tSoporte& soporte) {
 		}
 	}
 }
-
 
 void ordenarPorColor(tSoporte& soporte) {
 	tFicha tmp;
@@ -260,7 +258,7 @@ void mostrarEscaleras(tSoporte soporte) {
 }
 
 // Hay que ver
-void iniJugada(tJugada &jugada) {
+void iniJugada(tJugada& jugada) {
 	for (int i = 0; i < jugada.num_fichas; i++) {
 		jugada.lista_jugada[i] = { -1, libre };
 	}
@@ -285,7 +283,7 @@ void eliminaFichas(tSoporte& soporte, const tJugada jugada) {
 		for (int j = 0; j < soporte.num_fichas; j++) {
 			if (soporte.lista_ficha[j] == jugada.lista_jugada[i]) {
 
-				for (int k = j; k < soporte.num_fichas-1; k++) {
+				for (int k = j; k < soporte.num_fichas - 1; k++) {
 					soporte.lista_ficha[k] = soporte.lista_ficha[k + 1];
 				}
 				soporte.lista_ficha[soporte.num_fichas] = { -1, libre };
@@ -297,24 +295,182 @@ void eliminaFichas(tSoporte& soporte, const tJugada jugada) {
 }
 
 
-int nuevaJugada(tSoporte soporte, tJugada jugada) {
+int nuevaJugada(tSoporte& soporte, tJugada jugada) {
 
-	mostrar(soporte);
-	mostrarIndices(soporte.num_fichas);
+	int ret = 0;
 
-	return 1;
+	if (esSerie(jugada)) {
+		eliminaFichas(soporte, jugada);
+		mostrar(jugada);
+		cout << "  " << "- Serie correcta!";
+	}
+	else if(esEscalera(jugada)) {
+		eliminaFichas(soporte, jugada);
+		mostrar(jugada);
+		cout << "  " << "- Escalera correcta!";
+	}
+	else {
+		mostrar(jugada);
+		cout << "  " << "- Serie o Escalera incorrecta!";
+		ret = 1;
+	}
+
+	return ret;
 }
 
-bool ponerFicha(tJugada jugada, tFicha ficha) {
 
-	return true;
+
+bool esSerie(tJugada jugada) {
+
+	int i = 0;
+	bool esSerie = true;
+	tFicha aux;
+
+	if (jugada.num_fichas_jugada < 3 || jugada.num_fichas_jugada > 4) {
+		return false;
+	}
+
+	while (jugada.lista_jugada[i].valor != -1) {	
+		int j = (i + 1) % jugada.num_fichas_jugada;
+		while (j != i) {
+			if ((jugada.lista_jugada[i].valor != jugada.lista_jugada[j].valor) 
+				|| (jugada.lista_jugada[i].color == jugada.lista_jugada[j].color)) {
+				esSerie = false;
+			}
+
+			j = (j + 1) % jugada.num_fichas_jugada;
+		}
+		i++;
+	}
+
+	return esSerie;
+}
+
+
+bool esEscalera(tJugada jugada) {
+
+	if (jugada.num_fichas_jugada < 3 || jugada.num_fichas_jugada > 13) {
+		return false;
+	}
+
+	bool esEscalera = true;
+
+	for (int i = 0; i < jugada.num_fichas_jugada-1; i++) {
+		if ((jugada.lista_jugada[i + 1].valor != (jugada.lista_jugada[i].valor + 1))
+			|| (jugada.lista_jugada[i + 1].color != jugada.lista_jugada[i].color)) {
+			esEscalera = false;
+		}
+	}
+
+	return esEscalera;
+}
+
+
+bool ponerFicha(tJugada& jugada, tFicha ficha) {
+
+	tJugada aux = jugada;
+	
+	bool fichaColocada = false;
+
+	if (esSerie(jugada)) {	// Llamo a la función para comprobar si tras insertar la ficha sigue siendo una serie
+		aux.lista_jugada[aux.num_fichas_jugada] = ficha;
+		aux.num_fichas_jugada++;
+		aux.lista_jugada[aux.num_fichas_jugada] = { -1, libre };
+
+		if (esSerie(aux)) {
+			jugada.lista_jugada[jugada.num_fichas_jugada] = ficha;
+			jugada.num_fichas_jugada++;
+			jugada.lista_jugada[jugada.num_fichas_jugada] = { -1, libre };
+			fichaColocada = true;
+		}
+
+	}
+	else if (esEscalera(jugada)) {	// Lo mismo para la Escalera, pero se hay que comprobar el extremo a insertar
+
+		if (aux.lista_jugada[0].valor > ficha.valor) {
+
+			for (int i = aux.num_fichas_jugada; i > 0; i--) {
+				aux.lista_jugada[i] = aux.lista_jugada[i - 1];
+			}
+			aux.lista_jugada[0] = ficha;
+			aux.num_fichas_jugada++;
+			aux.lista_jugada[aux.num_fichas_jugada] = { -1, libre };
+
+		}
+		else {
+			aux.lista_jugada[aux.num_fichas_jugada] = ficha;
+			aux.num_fichas_jugada++;
+			aux.lista_jugada[aux.num_fichas_jugada] = { -1, libre };
+		}
+
+		if (esEscalera(aux)){
+			jugada.lista_jugada[jugada.num_fichas_jugada] = ficha;
+			jugada.num_fichas_jugada++;
+			jugada.lista_jugada[jugada.num_fichas_jugada] = { -1, libre };
+			fichaColocada = true;
+		}
+		
+	}
+	else if(jugada.num_fichas_jugada == 0){
+		jugada.lista_jugada[0] = ficha;
+		jugada.num_fichas_jugada++;
+		jugada.lista_jugada[jugada.num_fichas_jugada] = { -1, libre };
+		fichaColocada = true;
+	}
+
+	return fichaColocada;
+}
+
+
+bool jugar(tTablero& tablero, tSoporte& soporte) {
+
+	tJugada jugada;
+	jugada.num_fichas_jugada = 0;
+
+	int pos, cont = 0;
+
+	bool ret = false;
+
+	mostrarIndices(soporte.num_fichas);
+	cout << '\n';
+	cout << "Fichas (0 al final): ";
+
+	cin >> pos;
+	while (pos != 0) {
+		jugada.lista_jugada[jugada.num_fichas_jugada] = soporte.lista_ficha[pos-1];
+		jugada.num_fichas_jugada++;
+		cont++;
+		cin >> pos;
+	}
+
+
+	if (cont > 1) {
+		cout << "Jugada:  ";
+		if (nuevaJugada(soporte, jugada) == 0) {
+			eliminaFichas(soporte, jugada);
+			tablero.lista_jugadas[tablero.cont_jugadas] = jugada;
+			tablero.cont_jugadas++;	
+			ret = true;
+		}
+	}
+	else {
+		int aux;
+		cout << "Jugadas del tablero donde poner la ficha: ";
+		cin >> aux;
+		
+		ponerFicha(tablero.lista_jugadas[aux - 1], jugada.lista_jugada[0]);
+		eliminaFichas(soporte, jugada);
+		ret = true;
+	}
+
+	return ret;
 }
 
 
 int menor(const tSoportes soportes) {
 
 	int ret = -1;
-	int menor = -1; 
+	int menor = -1;
 
 	for (int i = 0; i < soportes.num_jug; i++) {
 		int acum = 0;	// Variable acumulador que suma todos los valores del soporte de un jugador
@@ -351,9 +507,10 @@ void mostrar(tBolsa bolsa) {
 	cout << "Bolsa:" << endl;
 
 	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < bolsa.num_fichas; j++) {
-			colorTexto(bolsa.fichas[i][j].color);
-			cout << bolsa.fichas[i][j].valor << "  ";
+		for (int j = 0; j < bolsa.num_fichas; j++) {		
+			int color = (bolsa.fichas[i][j].color) != libre ? bolsa.fichas[i][j].color : blanco;
+			colorTexto((tColor)color);
+			cout << setw(2) << bolsa.fichas[i][j].valor << "  ";
 		}
 		cout << endl;
 	}
@@ -362,7 +519,7 @@ void mostrar(tBolsa bolsa) {
 void mostrar(const tJugada jugada) {
 	for (int i = 0; i < jugada.num_fichas_jugada; i++) {
 		colorTexto(jugada.lista_jugada[i].color);
-		cout << "  " << jugada.lista_jugada[i].valor;
+		cout << setw(3) << jugada.lista_jugada[i].valor;
 	}
 }
 
@@ -380,7 +537,7 @@ void mostrar(tSoporte soporte) {
 	cout << "Soporte:";
 	for (int i = 0; i < soporte.num_fichas; i++) {
 		colorTexto(soporte.lista_ficha[i].color);
-		cout << "  " << soporte.lista_ficha[i].valor;
+		cout << setw(3) << soporte.lista_ficha[i].valor;
 	}
 	cout << endl;
 }
@@ -390,7 +547,7 @@ void mostrarIndices(int num) {
 	colorTexto(blanco);
 	cout << "          ";
 	for (int i = 0; i < num; i++) {
-		cout << "  " << i + 1;
+		cout << setw(3) << i + 1;
 	}
 }
 

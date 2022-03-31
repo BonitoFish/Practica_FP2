@@ -13,7 +13,7 @@ const int MAX_IniFichas = 14;
 const int MaxJugadas = MAX_NumFichas * 2;
 const int MaxFichas = 50;
 
-typedef enum { rojo, verde, azul, amarillo, blanco, libre } tColor;
+typedef enum  { rojo, verde, azul, amarillo, blanco, libre }tColor;
 
 // Cada ficha tiene un número y color
 typedef struct {
@@ -30,6 +30,7 @@ typedef struct {
 // Estructura que mantiene los soportes de los jugadores
 typedef struct {
 	tSoporte soporte_jug[MAX_NumJugadores];
+	int ini_fichas;	// Número de fichas que se hay que repartir a cada jugador (entre 6 y 14)
 	int num_jug;
 }tSoportes;
 
@@ -81,9 +82,11 @@ void nuevaJugada(tTablero& tablero, tJugada jugada);	// Añade al tablero la nuev
 
 void eliminaFichas(tSoporte& soporte, const tJugada jugada); // Elimina del soporte las fichas que hay en la jugada.
 
-int nuevaJugada(tSoporte soporte, tJugada jugada); // Permite al usuario crear una jugada con fichas que haya en su soporte.
+int nuevaJugada(tSoporte& soporte, tJugada jugada); // Permite al usuario crear una jugada con fichas que haya en su soporte.
 
-bool ponerFicha(tJugada jugada, tFicha ficha); // Intenta colocar la Ficha en la Jugada
+bool ponerFicha(tJugada& jugada, tFicha ficha); // Intenta colocar la Ficha en la Jugada
+
+bool jugar(tTablero& tablero, tSoporte& soporte); // Permite al usuario colocar fichas en el tablero o hacer nuevas jugadas
 
 int menor(const tSoportes soportes); // Devuelve el índice del soporte que acumula el menor número de puntos
 
@@ -98,6 +101,10 @@ void mostrar(tTablero tablero); // Muestra el Tablero
 void mostrar(tSoporte soporte); // Muestra las fichas que hay en el soporte
 
 void mostrarIndices(int num);  // Muestra los índices debajo de un soporte para facilitar la selección de fichas
+
+bool esSerie(tJugada jugada); // Identifica si la jugada es una serie
+
+bool esEscalera(tJugada jugada); // Identifica si la jugada es una escalera
 
 void parametros(int& numero_jugador, int& numero_fichas);
 
