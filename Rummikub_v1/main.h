@@ -1,4 +1,8 @@
 #pragma once
+#include <iostream>
+#include <time.h>
+#include <iomanip>
+#include <tuple>
 
 // Variables globales
 const int MIN_NumJugadores = 2;
@@ -31,26 +35,25 @@ typedef struct {
 typedef struct {
 	tSoporte soporte_jug[MAX_NumJugadores];
 	int ini_fichas;	// Número de fichas que se hay que repartir a cada jugador (entre 6 y 14)
-	int num_jug;
+	int num_jug; // Número de jugadores 
 }tSoportes;
 
 // La bolsa contiene las fichas a repartir y de donde se tiene que robar 
 typedef struct {
 	tFicha fichas[8][MAX_NumFichas];
-	int num_fichas;	// Representa el tamaño de la columna del array bidimensional
-	int fichas_disponibles;		
+	int num_fichas;	// Representa el tamaño de la columna del array bidimensional	
+	int total_ficha; // El número total de fichas de la bolsa
 }tBolsa;
 
 typedef struct {
 	tFicha lista_jugada[MAX_NumFichas + 1];
-	int num_fichas;		// Número máximo de fichas de la jugada
 	int num_fichas_jugada;		// Número de fichas jugadas
 }tJugada;
 
 // El tablero es donde contiene las jugadas 
 typedef struct {
 	tJugada lista_jugadas[MaxJugadas];
-	int num_fichas;
+	int max_jugadas;
 	int cont_jugadas;
 }tTablero;
 
@@ -62,7 +65,9 @@ void inicializarBolsa(tBolsa& bolsa);	// Inicializa la bolsa con las fichas
 
 tFicha robar(tBolsa& bolsa);	// Devuelve una ficha obtenida de la bolsa
 
-void repartir(tBolsa& bolsa, tSoportes soportes);	// Obtiene IniFichas para cada jugador
+bool robarFicha(tBolsa& bolsa, tSoporte& soporte); // Roba una ficha para un jugador
+
+void repartir(tBolsa& bolsa, tSoportes& soportes);	// Obtiene IniFichas para cada jugador
 
 void ordenarPorNum(tSoporte& soporte);		// Ordena las fichas del soporte por números, de menor a mayor.
 
@@ -76,6 +81,10 @@ void mostrarSeries(tSoporte soporte);	// Muestran las posíbles series que se pue
 
 void mostrarEscaleras(tSoporte soporte);	// Muestran las posíbles escaleraas que se puedan crear con las fichas del soporte
 
+bool existeSerie(tSoporte soporte);	// Devuelve true si al menos existe una Serie dentro del soporte
+
+bool existeEscalera(tSoporte soporte);	// Devuelve true si al menos existe una Escalera dentro del soporte
+
 void iniJugada(tJugada &jugada);		// Inicia las fichas de la jugada a -1
 
 void nuevaJugada(tTablero& tablero, tJugada jugada);	// Añade al tablero la nueva jugada
@@ -85,6 +94,8 @@ void eliminaFichas(tSoporte& soporte, const tJugada jugada); // Elimina del sopo
 int nuevaJugada(tSoporte& soporte, tJugada jugada); // Permite al usuario crear una jugada con fichas que haya en su soporte.
 
 bool ponerFicha(tJugada& jugada, tFicha ficha); // Intenta colocar la Ficha en la Jugada
+
+bool puedePonerFicha(tJugada jugada, const tFicha& ficha); // Comprueba si se puede colocar la ficha en la Jugada
 
 bool jugar(tTablero& tablero, tSoporte& soporte); // Permite al usuario colocar fichas en el tablero o hacer nuevas jugadas
 
@@ -106,7 +117,12 @@ bool esSerie(tJugada jugada); // Identifica si la jugada es una serie
 
 bool esEscalera(tJugada jugada); // Identifica si la jugada es una escalera
 
-void parametros(int& numero_jugador, int& numero_fichas);
+bool tieneFichas(const tSoporte& soporte); // Comprueba si el soporte de un jugador contiene fichas
 
+bool puedeColocarFicha(tTablero tablero, tSoportes soportes); // Comprueba si se puede colocar una ficha del soporte en el tablero
+
+std::tuple<int, int, int>parametros(); /* leer los parámetros con los que se va a incializar la partida, siendo el primer campo 
+	el número de jugadores, el segundo campo el número de fichas por columna que va tener la bolsa, y el último campo
+	el número de fichas iniciales que se van a repartir a cada jugador*/
 
 void colorTexto(tColor color);
