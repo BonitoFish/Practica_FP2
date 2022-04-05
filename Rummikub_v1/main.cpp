@@ -1,6 +1,12 @@
 #include "main.h"
 using namespace std;
 
+/*
+	Componentes del Grupo: 
+	- Daixiang Chen
+	- Xu Zheng					   
+*/
+
 int main() {
 
 	tBolsa bolsa;
@@ -69,7 +75,6 @@ int main() {
 			win = true;
 		}
 		else if (bolsa.total_ficha == 0) {
-			bool colocar = true;
 			if (!puedeColocarFicha(tablero, soportes)) {
 				int ganador = menor(soportes);
 				cout << "****Gana el Jugador " << ganador + 1 <<"!****"<< endl;
@@ -109,7 +114,7 @@ void inicializarBolsa(tBolsa& bolsa) {
 			}
 		}
 	}
-	bolsa.total_ficha = 8 * bolsa.num_fichas;
+	bolsa.total_ficha = 8 * bolsa.num_fichas; 
 }
 
 bool robarFicha(tBolsa& bolsa, tSoporte& soporte) {	
@@ -234,46 +239,43 @@ void mostrarSeries(tSoporte soporte) {
 				}
 			}
 
-			if (duplicado) {	// Si se trata de un número ya recorrido anteriormente se pasa a la siguiente iteración
-				continue;
-			}
-			else {	// De lo contrario guardamos ese valor para no repetir en las siguientes iteraciones
+			if (!duplicado) {	// Si el número no se ha repetido, entonces insertar en num para no repetir la próxima vez
 				num[tam_num] = soporte.lista_ficha[i].valor;
 				tam_num++;
+			}
+			else {	// Se pasa a la siguiente iteración si ya se había recorrido
+				continue;
 			}
 		}
 
 		serie[0] = soporte.lista_ficha[i];	// Suponemos que el primer elemento siempre será el del índice i
 		tam_serie++;
 
-for (int j = i + 1; j < soporte.num_fichas; j++) {	// Recorro para buscar elementos de la serie a devolver
+		for (int j = i + 1; j < soporte.num_fichas; j++) {	// Recorro para buscar elementos de la serie a devolver
 
-	if (soporte.lista_ficha[j].valor == serie[0].valor) {
-		bool mismo_color = false;
-		for (int k = 0; k < tam_serie; k++) {
-			if (serie[k].color == soporte.lista_ficha[j].color) {
-				mismo_color = true;
+			if (soporte.lista_ficha[j].valor == serie[0].valor) {
+				bool mismo_color = false;
+				for (int k = 0; k < tam_serie; k++) {
+					if (serie[k].color == soporte.lista_ficha[j].color) {
+						mismo_color = true;
+					}
+				}
+
+				if (!mismo_color) {	// Comprueba si el color es distinto, por tanto, insertar en la serie a devolver
+					serie[tam_serie] = soporte.lista_ficha[j];
+					tam_serie++;
+				}
 			}
 		}
-
-		if (mismo_color) {	// Lo mismo que arriba, se comprueba si tiene el mismo color
-			continue;
+		// Imprime la serie si supera el tamaño mínimo
+		if (tam_serie >= 3) {
+			for (int i = 0; i < tam_serie; i++) {
+				colorTexto(serie[i].color);
+				cout << setw(4) << serie[i].valor;
+			}
+			colorTexto(blanco);
+			cout << endl;
 		}
-		else {	// De lo contrario se introduce en la serie a devolver
-			serie[tam_serie] = soporte.lista_ficha[j];
-			tam_serie++;
-		}
-	}
-}
-// Devuelve la serie si supera el tamaño mínimo
-if (tam_serie >= 3) {
-	for (int i = 0; i < tam_serie; i++) {
-		colorTexto(serie[i].color);
-		cout << setw(4) << serie[i].valor;
-	}
-	colorTexto(blanco);
-	cout << endl;
-}
 	}
 }
 
@@ -296,12 +298,12 @@ void mostrarEscaleras(tSoporte soporte) {
 				}
 			}
 
-			if (escogido_prev) {
-				continue;
-			}
-			else {
+			if (!escogido_prev) {
 				num[tam_num] = soporte.lista_ficha[i].valor;
 				tam_num++;
+			}
+			else {
+				continue;
 			}
 		}
 
@@ -335,27 +337,25 @@ void mostrarEscaleras(tSoporte soporte) {
 }
 
 bool existeSerie(tSoporte soporte) {
-
+	// Prácticamente idéntico que mostrarSeries()
 	for (int i = 0; i < soporte.num_fichas; i++) {
 		tFicha serie[4];
 		serie[0] = soporte.lista_ficha[i];
-		int cont_serie = 1;
-		int j = (i + 1) % soporte.num_fichas;
-		while (j != i) {
-			if ((soporte.lista_ficha[i].valor == soporte.lista_ficha[j].valor)){
-				bool escogido = true;
+		int cont_serie = 1; // Número de elementos de la serie a devolver
+		for (int j = i + 1; j < soporte.num_fichas; j++) {	// Recorro para buscar elementos de la serie a devolver
+			if (soporte.lista_ficha[j].valor == serie[0].valor) {
+				bool mismo_color = false;
 				for (int k = 0; k < cont_serie; k++) {
-					if (soporte.lista_ficha[j].color == serie[k].color) {
-						escogido = false;
+					if (serie[k].color == soporte.lista_ficha[j].color) {
+						mismo_color = true;
 					}
 				}
 
-				if (escogido) {
+				if (!mismo_color) {	// se comprueba si el color es distinto, por tanto, insertar en la serie a devolver
 					serie[cont_serie] = soporte.lista_ficha[j];
 					cont_serie++;
 				}
 			}
-			++j;
 		}
 
 		if (cont_serie >= 3) {
@@ -366,22 +366,26 @@ bool existeSerie(tSoporte soporte) {
 }
 
 bool existeEscalera(tSoporte soporte) {
-
+	// Prácticamente idéntico que mostrarEscaleras()
 	for (int i = 0; i < soporte.num_fichas; i++) {
-		tFicha serie[13];
-		serie[0] = soporte.lista_ficha[i];
-		int cont_serie = 1;
+		tFicha escalera[13];
+		escalera[0] = soporte.lista_ficha[i];
+		int cont_escalera = 1;
+		tFicha elem = soporte.lista_ficha[i];	// Variable que utilizaremos como auxiliar
+
+		int k = i;
 		int j = (i + 1) % soporte.num_fichas;
-		while (j != i) {
-			if ((soporte.lista_ficha[i].color == soporte.lista_ficha[j].color)
-				&& (serie[cont_serie].valor + 1 == soporte.lista_ficha[j].valor) ) {
-				serie[cont_serie] = soporte.lista_ficha[j];
-				cont_serie++;
+		while (j != k) {	// Recorrido circular 
+			if (soporte.lista_ficha[j].valor == elem.valor + 1 && soporte.lista_ficha[j].color == elem.color) {
+				escalera[cont_escalera] = soporte.lista_ficha[j];
+				cont_escalera++;
+				elem = soporte.lista_ficha[j];	// Si existe elemento consecutivo empezar la búsqueda desde allí
+				k = j;
 			}
-			++j;
+			j = (j + 1) % soporte.num_fichas;
 		}
 
-		if (cont_serie >= 3) {
+		if (cont_escalera >= 3) {
 			return true;
 		}
 	}
@@ -454,12 +458,12 @@ int nuevaJugada(tSoporte& soporte, tJugada jugada) {
 
 bool esSerie(tJugada jugada) {
 
-	int i = 0;
-	bool esSerie = true;
 	if (jugada.num_fichas_jugada < 3 || jugada.num_fichas_jugada > 4) {
 		return false;
 	}
 
+	int i = 0;
+	bool esSerie = true;
 	while (jugada.lista_jugada[i].valor != -1 && esSerie) {	
 		int j = (i + 1) % jugada.num_fichas_jugada;
 		while (j != i && esSerie) {
@@ -512,10 +516,12 @@ bool ponerFicha(tJugada& jugada, tFicha ficha) {
 			}
 			aux.lista_jugada[0] = ficha;
 			aux.num_fichas_jugada++;
+			aux.lista_jugada[aux.num_fichas_jugada] = { -1, libre };
 		}
 		else {
 			aux.lista_jugada[aux.num_fichas_jugada] = ficha;
 			aux.num_fichas_jugada++;
+			aux.lista_jugada[aux.num_fichas_jugada] = { -1, libre };
 		}
 
 		if (esEscalera(aux)){
@@ -549,10 +555,12 @@ bool puedePonerFicha(tJugada jugada, const tFicha& ficha) {
 			}
 			jugada.lista_jugada[0] = ficha;
 			jugada.num_fichas_jugada++;
+			jugada.lista_jugada[jugada.num_fichas_jugada] = { -1, libre };
 		}
 		else {
 			jugada.lista_jugada[jugada.num_fichas_jugada] = ficha;
 			jugada.num_fichas_jugada++;
+			jugada.lista_jugada[jugada.num_fichas_jugada] = { -1, libre };
 		}
 
 		if (esEscalera(jugada)) {
@@ -671,13 +679,15 @@ bool puedeColocarFicha(tTablero tablero, tSoportes soportes) {
 	bool ret = false;
 
 	for (int i = 0; i < soportes.num_jug; i++) {
+		// Comprueba si existen Series o Escaleras dentro del soporte de cualquier Jugador
 		if (existeSerie(soportes.soporte_jug[i]) || existeEscalera(soportes.soporte_jug[i])) {
 			ret = true;
 		}
 		else {
+			// Prueba con todas las fichas de un Jugador para colocar en todas las jugadas del Tablero
 			for (int j = 0; j < tablero.cont_jugadas; j++) {
 				for (int k = 0; k < soportes.soporte_jug[i].num_fichas; k++) {
-					if (ponerFicha(tablero.lista_jugadas[j], soportes.soporte_jug[i].lista_ficha[k])) {
+					if (puedePonerFicha(tablero.lista_jugadas[j], soportes.soporte_jug[i].lista_ficha[k])) {
 						ret = true;
 					}
 				}
