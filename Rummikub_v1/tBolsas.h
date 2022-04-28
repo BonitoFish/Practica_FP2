@@ -4,13 +4,7 @@
 #include <iomanip>
 #include <tuple>
 
-#include "tBolsas.h"
-#include "tColor.h"
-#include "tFicha.h"
 #include "tSoporte.h"
-#include "tSoportes.h"
-#include "tTablero.h"
-#include "tJugada.h"
 
 const int MIN_NumJugadores = 2;
 const int MAX_NumJugadores = 4;
