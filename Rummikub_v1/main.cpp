@@ -1,4 +1,10 @@
-#include "main.h"
+#include "tBolsas.h"
+#include "tColor.h"
+#include "tFicha.h"
+#include "tSoporte.h"
+#include "tSoportes.h"
+#include "tTablero.h"
+#include "tJugada.h"
 using namespace std;
 
 /*
@@ -13,10 +19,10 @@ int main() {
 	tTablero tablero;
 	tSoportes soportes;
 
-	// Se realiza la lectura de datos para la posterior inicialización de los parámetros de juego
+	// Se realiza la lectura de datos para la posterior inicializaciï¿½n de los parï¿½metros de juego
 	auto [num_jugadores, num_fichas, num_iniFichas] = parametros();
 
-	// Inicialización de las estructuras de datos
+	// Inicializaciï¿½n de las estructuras de datos
 	bolsa.num_fichas = num_fichas;
 	inicializarBolsa(bolsa);	
 	
@@ -33,7 +39,7 @@ int main() {
 
 	srand(time(NULL));
 
-	// Reparte las fichas a cada jugador según los parámetros introducidos anteriormente
+	// Reparte las fichas a cada jugador segï¿½n los parï¿½metros introducidos anteriormente
 	repartir(bolsa, soportes);	
 	
 	// Bucle Principal
@@ -134,7 +140,7 @@ tFicha robar(tBolsa& bolsa) {
 	int fila_rand = std::rand() % 8 + 0; // Rango 0 - 7 incluidos
 	int col_rand = std::rand() % bolsa.num_fichas + 0; // Rando 0 - bolsa.num_fichas-1 incluidos
 
-	if (bolsa.fichas[fila_rand][col_rand].valor != -1) {	// Devuelve la ficha si la encuentra en una posición random
+	if (bolsa.fichas[fila_rand][col_rand].valor != -1) {	// Devuelve la ficha si la encuentra en una posiciï¿½n random
 		ret = bolsa.fichas[fila_rand][col_rand];
 		bolsa.fichas[fila_rand][col_rand] = { -1, libre };
 	}
@@ -143,7 +149,7 @@ tFicha robar(tBolsa& bolsa) {
 			(col_rand == bolsa.num_fichas - 1 && fila_rand == 7) ? 0 : fila_rand;
 		int j = (col_rand + 1) % bolsa.num_fichas;
 		
-		// Implementación mediante búsqueda circular
+		// Implementaciï¿½n mediante bï¿½squeda circular
 		for (int k = 0; k < (8 * bolsa.num_fichas)-1; k++) {
 			if (bolsa.fichas[i][j].valor != -1) {	
 				ret = bolsa.fichas[i][j];
@@ -218,7 +224,7 @@ int buscar(const tJugada jugada, tFicha ficha) {
 }
 
 void mostrarSeries(tSoporte soporte) {
-	int num[13];	// Lista números que ya se ha escogido para no repetir
+	int num[13];	// Lista nï¿½meros que ya se ha escogido para no repetir
 	int tam_num = 0;
 
 	// Recorrido de las fichas del soporte
@@ -227,7 +233,7 @@ void mostrarSeries(tSoporte soporte) {
 		tFicha serie[4];	// La serie que voy a devolver al final si existe
 		int tam_serie = 0;
 
-		if (tam_num == 0) {	// Este es primer caso para un primer valor (solo se evalúa una vez)
+		if (tam_num == 0) {	// Este es primer caso para un primer valor (solo se evalï¿½a una vez)
 			num[0] = soporte.lista_ficha[i].valor;
 			tam_num++;	
 		}
@@ -239,16 +245,16 @@ void mostrarSeries(tSoporte soporte) {
 				}
 			}
 
-			if (!duplicado) {	// Si el número no se ha repetido, entonces insertar en num para no repetir la próxima vez
+			if (!duplicado) {	// Si el nï¿½mero no se ha repetido, entonces insertar en num para no repetir la prï¿½xima vez
 				num[tam_num] = soporte.lista_ficha[i].valor;
 				tam_num++;
 			}
-			else {	// Se pasa a la siguiente iteración si ya se había recorrido
+			else {	// Se pasa a la siguiente iteraciï¿½n si ya se habï¿½a recorrido
 				continue;
 			}
 		}
 
-		serie[0] = soporte.lista_ficha[i];	// Suponemos que el primer elemento siempre será el del índice i
+		serie[0] = soporte.lista_ficha[i];	// Suponemos que el primer elemento siempre serï¿½ el del ï¿½ndice i
 		tam_serie++;
 
 		for (int j = i + 1; j < soporte.num_fichas; j++) {	// Recorro para buscar elementos de la serie a devolver
@@ -267,7 +273,7 @@ void mostrarSeries(tSoporte soporte) {
 				}
 			}
 		}
-		// Imprime la serie si supera el tamaño mínimo
+		// Imprime la serie si supera el tamaï¿½o mï¿½nimo
 		if (tam_serie >= 3) {
 			for (int i = 0; i < tam_serie; i++) {
 				colorTexto(serie[i].color);
@@ -280,7 +286,7 @@ void mostrarSeries(tSoporte soporte) {
 }
 
 void mostrarEscaleras(tSoporte soporte) {
-	int num[13];	// Lista números que ya se ha escogido para no repetir
+	int num[13];	// Lista nï¿½meros que ya se ha escogido para no repetir
 	int tam_num = 0;
 
 	for (int i = 0; i < soporte.num_fichas; i++) {	// Se itera sobre cada uno de los elementos del soporte
@@ -290,7 +296,7 @@ void mostrarEscaleras(tSoporte soporte) {
 			tam_num++;
 		}
 		else {
-			// Recorro mi lista de números para ver si se ha escogido previamente para formar una Escalera
+			// Recorro mi lista de nï¿½meros para ver si se ha escogido previamente para formar una Escalera
 			bool escogido_prev = false;
 			for (int j = 0; j < tam_num; j++) {
 				if (num[j] == soporte.lista_ficha[i].valor) {
@@ -308,7 +314,7 @@ void mostrarEscaleras(tSoporte soporte) {
 		}
 
 		tFicha escalera[13];	// La escalera a devolver si existe
-		escalera[0] = soporte.lista_ficha[i];	// Se supone que en cada iteración el primer elem es el del índice i
+		escalera[0] = soporte.lista_ficha[i];	// Se supone que en cada iteraciï¿½n el primer elem es el del ï¿½ndice i
 		int tam_escalera = 1;
 		tFicha elem = soporte.lista_ficha[i];	// Variable que utilizaremos como auxiliar
 
@@ -318,7 +324,7 @@ void mostrarEscaleras(tSoporte soporte) {
 			if (soporte.lista_ficha[j].valor == elem.valor + 1 && soporte.lista_ficha[j].color == elem.color) {
 				escalera[tam_escalera] = soporte.lista_ficha[j];
 				tam_escalera++;
-				elem = soporte.lista_ficha[j];	// Si existe elemento consecutivo empezar la búsqueda desde allí
+				elem = soporte.lista_ficha[j];	// Si existe elemento consecutivo empezar la bï¿½squeda desde allï¿½
 				k = j;
 			}
 			j = (j + 1) % soporte.num_fichas;
@@ -337,11 +343,11 @@ void mostrarEscaleras(tSoporte soporte) {
 }
 
 bool existeSerie(tSoporte soporte) {
-	// Prácticamente idéntico que mostrarSeries()
+	// Prï¿½cticamente idï¿½ntico que mostrarSeries()
 	for (int i = 0; i < soporte.num_fichas; i++) {
 		tFicha serie[4];
 		serie[0] = soporte.lista_ficha[i];
-		int cont_serie = 1; // Número de elementos de la serie a devolver
+		int cont_serie = 1; // Nï¿½mero de elementos de la serie a devolver
 		for (int j = i + 1; j < soporte.num_fichas; j++) {	// Recorro para buscar elementos de la serie a devolver
 			if (soporte.lista_ficha[j].valor == serie[0].valor) {
 				bool mismo_color = false;
@@ -366,7 +372,7 @@ bool existeSerie(tSoporte soporte) {
 }
 
 bool existeEscalera(tSoporte soporte) {
-	// Prácticamente idéntico que mostrarEscaleras()
+	// Prï¿½cticamente idï¿½ntico que mostrarEscaleras()
 	for (int i = 0; i < soporte.num_fichas; i++) {
 		tFicha escalera[13];
 		escalera[0] = soporte.lista_ficha[i];
@@ -379,7 +385,7 @@ bool existeEscalera(tSoporte soporte) {
 			if (soporte.lista_ficha[j].valor == elem.valor + 1 && soporte.lista_ficha[j].color == elem.color) {
 				escalera[cont_escalera] = soporte.lista_ficha[j];
 				cont_escalera++;
-				elem = soporte.lista_ficha[j];	// Si existe elemento consecutivo empezar la búsqueda desde allí
+				elem = soporte.lista_ficha[j];	// Si existe elemento consecutivo empezar la bï¿½squeda desde allï¿½
 				k = j;
 			}
 			j = (j + 1) % soporte.num_fichas;
@@ -498,7 +504,7 @@ bool ponerFicha(tJugada& jugada, tFicha ficha) {
 
 	tJugada aux = jugada;
 	bool fichaColocada = false;
-	if (esSerie(jugada)) {	// Llamo a la función para comprobar si tras insertar la ficha sigue siendo una serie
+	if (esSerie(jugada)) {	// Llamo a la funciï¿½n para comprobar si tras insertar la ficha sigue siendo una serie
 		aux.lista_jugada[aux.num_fichas_jugada] = ficha;
 		aux.num_fichas_jugada++;
 		aux.lista_jugada[aux.num_fichas_jugada] = { -1, libre };
@@ -539,7 +545,7 @@ bool ponerFicha(tJugada& jugada, tFicha ficha) {
 
 bool puedePonerFicha(tJugada jugada, const tFicha& ficha) {
 	bool fichaColocada = false;
-	if (esSerie(jugada)) {	// Llamo a la función para comprobar si tras insertar la ficha sigue siendo una serie
+	if (esSerie(jugada)) {	// Llamo a la funciï¿½n para comprobar si tras insertar la ficha sigue siendo una serie
 		jugada.lista_jugada[jugada.num_fichas_jugada] = ficha;
 		jugada.num_fichas_jugada++;
 		jugada.lista_jugada[jugada.num_fichas_jugada] = { -1, libre };
@@ -599,12 +605,12 @@ bool jugar(tTablero& tablero, tSoporte& soporte) {
 		cin >> pos;
 	}
 
-	// Si ha metido más de una Ficha en la Jugada
+	// Si ha metido mï¿½s de una Ficha en la Jugada
 	if (jugada.num_fichas_jugada > 1) {
 		cout << "Jugada:  ";
 		mostrar(jugada);
 
-		// si la jugada es válida (= 0), añadir la nueva Jugada en el Tablero
+		// si la jugada es vï¿½lida (= 0), aï¿½adir la nueva Jugada en el Tablero
 		int nueva_jugada = nuevaJugada(soporte, jugada);
 		
 		if (nueva_jugada == 0) {
@@ -659,7 +665,7 @@ int menor(const tSoportes soportes) {
 			acum += soportes.soporte_jug[i].lista_ficha[j].valor;
 		}
 
-		if (menor == -1) {	// Solo entra una vez al if para establecer un valor inicial válido
+		if (menor == -1) {	// Solo entra una vez al if para establecer un valor inicial vï¿½lido
 			menor = acum;
 			ret = i;
 		}
