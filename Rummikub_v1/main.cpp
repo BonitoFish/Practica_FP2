@@ -26,10 +26,10 @@ int main() {
 	tTablero tablero;
 	tSoportes soportes;
 
-	// Se realiza la lectura de datos para la posterior inicializaciÛn de los par·metros de juego
+	// Se realiza la lectura de datos para la posterior inicializaci√≥n de los par√°metros de juego
 	auto [num_jugadores, num_fichas, num_iniFichas] = parametros();
 
-	// InicializaciÛn de las estructuras de datos
+	// Inicializaci√≥n de las estructuras de datos
 	bolsa.num_fichas = num_fichas;
 	inicializarBolsa(bolsa);
 
@@ -46,7 +46,7 @@ int main() {
 
 	srand(time(NULL));
 
-	// Reparte las fichas a cada jugador seg˙n los par·metros introducidos anteriormente
+	// Reparte las fichas a cada jugador seg√∫n los par√°metros introducidos anteriormente
 	repartir(bolsa, soportes);
 
 	// Bucle Principal
@@ -149,5 +149,5 @@ std::tuple<int, int, int>parametros() {
 
 
 
-
+//test
 
